@@ -18,6 +18,22 @@
 #include <stdexcept>
 #include <vector>
 #include <unordered_map>
+
+// Define missing constants
+#define LUA_SIGNATURE "\x1bLua"
+#define LUA_MASKCOUNT 1
+#define LUA_OK 0
+
+// Forward declarations for missing functions
+extern "C" {
+    int luaL_error(lua_State* L, const char* fmt, ...);
+    int luaL_loadbuffer(lua_State* L, const char* buff, size_t sz, const char* name);
+    
+    // Debug hook related
+    typedef struct lua_Debug lua_Debug;
+    typedef void (*lua_Hook) (lua_State *L, lua_Debug *ar);
+    void lua_sethook(lua_State *L, lua_Hook func, int mask, int count);
+}
 #include <chrono>
 
 // Enhanced VM execution for Roblox with better error handling and optimizations
