@@ -83,6 +83,7 @@ namespace Memory {
         static MemoryRegion FindMemoryRegion(uintptr_t address);
         
         // Low-level memory operations
+    public:
         static bool ReadMemory(uintptr_t address, void* buffer, size_t size);
         static bool WriteMemory(uintptr_t address, const void* buffer, size_t size);
     };
