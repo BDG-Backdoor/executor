@@ -36,6 +36,7 @@
 
 // Opcode constants for compatibility
 #define LOP_NOP 0
+#define LOP_BREAK 1
 #define LOP_LOADNIL 2
 #define LOP_LOADB 3
 #define LOP_LOADN 4

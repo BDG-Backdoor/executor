@@ -53,6 +53,10 @@ namespace Memory {
     // Memory utilities
     class MemoryUtils {
     public:
+        // Low-level memory operations
+        static bool ReadMemory(uintptr_t address, void* buffer, size_t size);
+        static bool WriteMemory(uintptr_t address, const void* buffer, size_t size);
+        
         // Read memory
         template<typename T>
         static T Read(uintptr_t address) {
@@ -81,11 +85,6 @@ namespace Memory {
         
         // Find memory region containing address
         static MemoryRegion FindMemoryRegion(uintptr_t address);
-        
-        // Low-level memory operations
-    public:
-        static bool ReadMemory(uintptr_t address, void* buffer, size_t size);
-        static bool WriteMemory(uintptr_t address, const void* buffer, size_t size);
     };
     
     // Memory patching utilities

@@ -1,3 +1,16 @@
+#!/bin/bash
+
+# Clean up object files
+rm -f ./VM/src/*.o
+
+# Create a backup directory
+mkdir -p ./VM/src/backup
+
+# Backup original files
+cp ./VM/src/*.cpp ./VM/src/backup/
+
+# Create a Common.h file with the flags defined as extern
+cat > ./VM/src/Luau/Common.h << 'EOF'
 // Common.h - Common definitions for Luau VM
 #pragma once
 
@@ -66,7 +79,6 @@
 #define LUAU_ASSERT(cond) ((void)0)
 #define LUAU_UNREACHABLE() ((void)0)
 #define LUAU_UNREACHABLE_FALLTHROUGH ((void)0)
-#define LUAU_FALLTHROUGH ((void)0)
 
 // Constant types
 #define LCT_NIL 0
@@ -91,15 +103,42 @@ namespace FFlag
     extern bool LuauRecursionLimit;
     extern bool LuauTailCallOptimization;
     extern bool LuauStringFormatFixC;
-    extern bool LuauLibWhereErrorAutoreserve;
 }
+EOF
 
-// Fast flag macros
-#define LUAU_FASTFLAGVARIABLE(name) namespace FFlag { bool name = true; }
-#define LUAU_DYNAMIC_FASTFLAGVARIABLE(name, value) namespace FFlag { bool name = value; }
+# Create a Flags.cpp file with the flags defined
+cat > ./VM/src/Luau/Flags.cpp << 'EOF'
+#include "Luau/Common.h"
 
-// For compatibility
-namespace DFFlag
+namespace FFlag
 {
-    using namespace FFlag;
+    bool LuauFastintSupport = true;
+    bool LuauVectorLib = true;
+    bool LuauBufferLib = true;
+    bool LuauRecursionLimit = true;
+    bool LuauTailCallOptimization = true;
+    bool LuauStringFormatFixC = true;
 }
+EOF
+
+# Find all cpp files in VM/src
+for file in ./VM/src/*.cpp; do
+    # Skip our flags file
+    if [[ "$file" == "./VM/src/Luau/Flags.cpp" ]]; then
+        continue
+    fi
+    
+    # Remove any existing FFlag definitions
+    sed -i '/namespace FFlag/,/}/d' "$file"
+    sed -i '/bool FFlag::LuauFastintSupport/d' "$file"
+    sed -i '/bool FFlag::LuauVectorLib/d' "$file"
+    sed -i '/bool FFlag::LuauBufferLib/d' "$file"
+    sed -i '/bool FFlag::LuauRecursionLimit/d' "$file"
+    sed -i '/bool FFlag::LuauTailCallOptimization/d' "$file"
+    sed -i '/bool FFlag::LuauStringFormatFixC/d' "$file"
+    
+    # Add include for our common header at the top of the file
+    sed -i '1i #include "Luau/Common.h"' "$file"
+done
+
+echo "Fixed flag definitions in VM source files"
